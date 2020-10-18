@@ -22,6 +22,8 @@
         
         $endTime = intval($data[1]);
         $description = $data[0];
+
+        echo $endTime . ' ' . $description;
     }
 ?>
 <!doctype html>
@@ -133,7 +135,9 @@
         $hour = floor($diff / 3600);
         $minute = floor(($diff % 3600) / 60);
         $second = $diff % 60;
-        $url = 'http://' . $_SERVER['HTTP_HOST'] . '?f=' . $filename;
+        $baseUrl = 'http://' . $_SERVER['HTTP_HOST'];
+        $shareUrl = $baseUrl . '?f=' . $filename;
+        $timeUrl = $baseUrl . '/time.php';
 ?>
     <h1 class="center">WAKTU PENGERJAAN</h1>
     <h3 class="center">
@@ -154,17 +158,19 @@
         </span>
     </div>
     <div class="center share">
-        <h3>Share: <a href="<?php echo $url; ?>"><?php echo $url; ?></a></h3>
+        <h3>Share: <a href="<?php echo $shareUrl; ?>"><?php echo $shareUrl; ?></a></h3>
     </div>
     <script>
-        const endTime = <?php echo $endTime * 1000; ?>;
+        const endTime = <?php echo $endTime; ?>;
 
-        function update() {
-            const now = new Date().getTime();
-            const diff = Math.floor((endTime - now) / 1000);
-            const hour = Math.max(0, Math.floor(diff / 3600));
-            const minute = Math.max(0, Math.floor((diff % 3600) / 60));
-            const second = Math.max(0, diff % 60);
+        async function update() {
+            let response = await fetch('<?php echo $timeUrl; ?>');
+            let now = parseInt(await response.text());
+
+            let diff = Math.floor(endTime - now);
+            let hour = Math.max(0, Math.floor(diff / 3600));
+            let minute = Math.max(0, Math.floor((diff % 3600) / 60));
+            let second = Math.max(0, diff % 60);
 
             document.getElementById('hour').innerHTML = leadZero(hour);
             document.getElementById('minute').innerHTML = leadZero(minute);
@@ -175,7 +181,7 @@
             return ("0" + num.toString()).slice(-2);
         }
 
-        setInterval(update, 100);
+        setInterval(update, 1000);
     </script>
 <?php
     }
