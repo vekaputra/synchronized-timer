@@ -141,24 +141,44 @@
     </h3>
     <div class="center timer">
         <span>
-            <p class="s144"><?php echo $hour; ?></p>
+            <p class="s144" id="hour"><?php echo sprintf("%02d", $hour); ?></p>
             <h3>HOUR</h3>
         </span>
         <span>
-            <p class="s144"><?php echo $minute; ?></p>
+            <p class="s144" id="minute"><?php echo sprintf("%02d", $minute); ?></p>
             <h3>MINUTE</h3>
         </span>
         <span>
-            <p class="s144"><?php echo $second; ?></p>
+            <p class="s144" id="second"><?php echo sprintf("%02d", $second); ?></p>
             <h3>SECOND</h3>
         </span>
     </div>
     <div class="center share">
         <h3>Share: <a href="<?php echo $url; ?>"><?php echo $url; ?></a></h3>
     </div>
+    <script>
+        const endTime = <?php echo $endTime * 1000; ?>;
+
+        function update() {
+            const now = new Date().getTime();
+            const diff = Math.floor((endTime - now) / 1000);
+            const hour = Math.max(0, Math.floor(diff / 3600));
+            const minute = Math.max(0, Math.floor((diff % 3600) / 60));
+            const second = Math.max(0, diff % 60);
+
+            document.getElementById('hour').innerHTML = leadZero(hour);
+            document.getElementById('minute').innerHTML = leadZero(minute);
+            document.getElementById('second').innerHTML = leadZero(second);
+        }
+
+        function leadZero(num) {
+            return ("0" + num.toString()).slice(-2);
+        }
+
+        setInterval(update, 100);
+    </script>
 <?php
     }
 ?>
-  <script></script>
 </body>
 </html>
